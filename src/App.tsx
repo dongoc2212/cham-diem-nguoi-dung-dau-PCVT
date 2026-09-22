@@ -7,6 +7,7 @@ import { LoginScreen } from './components/LoginScreen';
 import { LoginModal } from './components/LoginModal';
 import { AuditHistoryView } from './components/AuditHistoryView';
 import { SummaryDashboard } from './components/SummaryDashboard';
+import { AdminLockManager } from './components/AdminLockManager';
 
 function MainLayout() {
   const { activeTab, setActiveTab, currentUser, login } = useApp();
@@ -30,6 +31,8 @@ function MainLayout() {
           <SummaryDashboard />
         ) : activeTab === 'audit' ? (
           <AuditHistoryView onJumpToSheet={sheetId => setActiveTab(sheetId)} />
+        ) : activeTab === 'admin' ? (
+          <AdminLockManager />
         ) : (
           <ScoringTable />
         )}

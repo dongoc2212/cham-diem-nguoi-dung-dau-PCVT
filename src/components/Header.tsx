@@ -8,7 +8,8 @@ import {
   LogIn, 
   LogOut, 
   Building2,
-  CheckCircle2
+  CheckCircle2,
+  Lock
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { exportSingleSheetToExcel, exportAllSheetsToExcel } from '../utils/excelExport';
@@ -20,14 +21,18 @@ interface HeaderProps {
 export const Header: React.FC<HeaderProps> = ({ onOpenHistory }) => {
   const { 
     currentUser, 
+    isAdmin,
     logout, 
     triggerLoginModal, 
     currentSheet, 
     sheets, 
     resetAllData, 
     allHistory,
-    setActiveTab 
+    setActiveTab,
+    isSelfLocked,
+    isAuditLocked
   } = useApp();
+
 
   const handleExportCurrent = () => {
     if (currentSheet) {
@@ -105,6 +110,22 @@ export const Header: React.FC<HeaderProps> = ({ onOpenHistory }) => {
                 </span>
               )}
             </button>
+
+            {/* Admin Lock Manager button (For 012499) */}
+            {isAdmin && (
+              <button
+                id="btn-header-admin-locks"
+                onClick={() => setActiveTab('admin')}
+                title="Quản trị viên 012499: Thiết lập khóa chấm điểm và phúc tra theo ngày"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-rose-700 hover:bg-rose-600 text-white shadow-sm border border-rose-500/50 transition-colors"
+              >
+                <Lock className="w-3.5 h-3.5 text-amber-300" />
+                <span>Khóa Theo Ngày</span>
+                {(isSelfLocked.isLocked || isAuditLocked.isLocked) && (
+                  <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+                )}
+              </button>
+            )}
 
             {/* Reset data */}
             <button

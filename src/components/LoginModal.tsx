@@ -111,6 +111,23 @@ export const LoginModal: React.FC = () => {
             >
               Đăng Nhập
             </button>
+
+            {/* Quick Admin 012499 selector */}
+            <div className="pt-2 flex items-center justify-between text-xs bg-amber-50/80 p-2 rounded-lg border border-amber-200 text-amber-900">
+              <span className="text-[11px]">
+                👑 <strong>Admin 012499:</strong> Đỗ Thị Bích Ngọc
+              </span>
+              <button
+                type="button"
+                onClick={() => {
+                  setEmployeeId('012499');
+                  setPassword('123456');
+                }}
+                className="px-2 py-0.5 bg-amber-200/90 hover:bg-amber-300 text-amber-950 font-bold rounded text-[10px]"
+              >
+                Chọn nhanh
+              </button>
+            </div>
           </form>
 
         </div>

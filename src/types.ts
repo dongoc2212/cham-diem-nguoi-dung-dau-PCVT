@@ -61,3 +61,29 @@ export interface AuditFilter {
   field?: string;
   searchTerm?: string;
 }
+
+export interface LockSettings {
+  selfScoreLocked: boolean;           // Khóa thủ công chấm điểm
+  selfScoreLockDate: string;          // Ngày khóa chấm điểm (YYYY-MM-DD), rỗng nếu không khóa theo ngày
+  selfScoreLockTime: string;          // Giờ khóa chấm điểm (HH:mm), ví dụ 23:59
+  
+  auditScoreLocked: boolean;          // Khóa thủ công phúc tra
+  auditScoreLockDate: string;         // Ngày khóa phúc tra (YYYY-MM-DD), rỗng nếu không khóa theo ngày
+  auditScoreLockTime: string;         // Giờ khóa phúc tra (HH:mm), ví dụ 23:59
+
+  lastUpdatedBy?: {
+    userCode: string;
+    userName: string;
+    timestamp: string;
+  };
+}
+
+export interface LockStatusResult {
+  isLocked: boolean;
+  reason: string;
+  isDateLocked: boolean;
+  isManualLocked: boolean;
+  lockDate?: string;
+  lockTime?: string;
+}
+

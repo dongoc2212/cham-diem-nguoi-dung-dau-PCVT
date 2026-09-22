@@ -1,22 +1,34 @@
 import { User } from '../types';
 import staffData from './staffDirectory.json';
 
+export const ADMIN_EMPLOYEE_ID = '012499';
+
+export function isAdminUser(user?: User | null): boolean {
+  if (!user) return false;
+  const clean = String(user.employeeId || '').trim();
+  return clean === ADMIN_EMPLOYEE_ID || clean === '12499' || user.role === 'admin';
+}
+
 // All 436 personnel from Google Sheet: https://docs.google.com/spreadsheets/d/1aj3zL1ATxT0nVUOCtKZEWLRUXOli0z0t (gid=681599665)
 export const STAFF_DIRECTORY: User[] = (staffData as any[]).map(item => {
+  const empId = String(item.employeeId).trim();
   let role: User['role'] = 'staff';
   const titleLower = (item.title || '').toLowerCase();
   const deptLower = (item.department || '').toLowerCase();
 
-  if (titleLower.includes('giám đốc') || titleLower.includes('chánh') || titleLower.includes('trưởng')) {
+  // Admin đặc quyền: Mã nhân viên 012499 (Đỗ Thị Bích Ngọc - Phòng Tổ chức và Nhân sự)
+  if (empId === '012499' || empId === '12499') {
+    role = 'admin';
+  } else if (titleLower.includes('giám đốc') || titleLower.includes('chánh') || titleLower.includes('trưởng')) {
     role = 'leader';
   } else if (deptLower.includes('ban giám đốc')) {
     role = 'reviewer';
   }
 
   return {
-    employeeId: String(item.employeeId).trim(),
+    employeeId: empId,
     name: item.name.trim(),
-    title: item.title?.trim() || 'Cán bộ',
+    title: (empId === '012499' || empId === '12499') ? 'Quản Trị Viên Hệ Thống (Tổ Chức Nhân Sự)' : (item.title?.trim() || 'Cán bộ'),
     department: item.department?.trim() || 'Công ty Điện lực Vũng Tàu',
     unit: item.department?.trim() || 'Công ty Điện lực Vũng Tàu',
     team: item.team?.trim() || '',
@@ -26,6 +38,7 @@ export const STAFF_DIRECTORY: User[] = (staffData as any[]).map(item => {
     role
   };
 });
+
 
 // Alias for backward compatibility
 export const DEFAULT_USERS = STAFF_DIRECTORY;

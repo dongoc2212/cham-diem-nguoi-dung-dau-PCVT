@@ -18,7 +18,7 @@ export const EditCellModal: React.FC<EditCellModalProps> = ({
   sheetId,
   field
 }) => {
-  const { currentUser, updateCell, triggerLoginModal } = useApp();
+  const { currentUser, updateCell, triggerLoginModal, isAdmin, isSelfLocked, isAuditLocked } = useApp();
 
   const [scoreValue, setScoreValue] = useState<string>('');
   const [textValue, setTextValue] = useState<string>('');
@@ -43,6 +43,10 @@ export const EditCellModal: React.FC<EditCellModalProps> = ({
 
   const isNumeric = field === 'selfScore' || field === 'auditScore' || field === 'standardScore';
 
+  const isFieldCurrentlyLocked = 
+    ((field === 'selfScore' || field === 'explanation') && isSelfLocked.isLocked) ||
+    (field === 'auditScore' && isAuditLocked.isLocked);
+
   const fieldTitles: Record<string, string> = {
     selfScore: 'Điều chỉnh Điểm Chấm (Tự chấm)',
     explanation: 'Cập nhật Nội dung Giải Trình',
@@ -58,8 +62,8 @@ export const EditCellModal: React.FC<EditCellModalProps> = ({
 
     if (isNumeric) {
       if (scoreValue.trim() === '') {
-        updateCell(sheetId, row.id, field, null);
-        onClose();
+        const ok = updateCell(sheetId, row.id, field, null);
+        if (ok) onClose();
         return;
       }
 
@@ -81,12 +85,12 @@ export const EditCellModal: React.FC<EditCellModalProps> = ({
         }
       }
 
-      updateCell(sheetId, row.id, field, num);
+      const ok = updateCell(sheetId, row.id, field, num);
+      if (ok) onClose();
     } else {
-      updateCell(sheetId, row.id, field, textValue.trim());
+      const ok = updateCell(sheetId, row.id, field, textValue.trim());
+      if (ok) onClose();
     }
-
-    onClose();
   };
 
   const handleQuickScore = (val: number) => {
@@ -134,6 +138,37 @@ export const EditCellModal: React.FC<EditCellModalProps> = ({
               </div>
             )}
           </div>
+
+          {/* Admin bypass indicator or lock alert */}
+          {isFieldCurrentlyLocked && (
+            <div className={`p-2.5 rounded-lg border text-xs flex items-center gap-2 ${
+              isAdmin 
+                ? 'bg-amber-50 text-amber-900 border-amber-300' 
+                : 'bg-rose-50 text-rose-900 border-rose-300'
+            }`}>
+              {isAdmin ? (
+                <>
+                  <span className="text-base">👑</span>
+                  <div>
+                    <span className="font-bold">Đặc quyền Quản trị viên (012499):</span>
+                    <span className="text-[11px] block text-amber-800">
+                      Mục này đang bị khóa đối với các đơn vị, nhưng bạn có thẩm quyền can thiệp và chỉnh sửa.
+                    </span>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <AlertCircle className="w-4 h-4 text-rose-600 flex-shrink-0" />
+                  <div>
+                    <span className="font-bold">Mục này đang bị khóa!</span>
+                    <span className="text-[11px] block text-rose-700">
+                      Hệ thống đã khóa quyền sửa mục này. Chỉ Quản trị viên (Mã NV: 012499) mới có thể can thiệp.
+                    </span>
+                  </div>
+                </>
+              )}
+            </div>
+          )}
 
           {/* Form input */}
           {isNumeric ? (

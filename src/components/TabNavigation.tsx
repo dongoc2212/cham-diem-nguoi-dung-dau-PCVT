@@ -3,15 +3,29 @@ import {
   Building2, 
   BarChart3, 
   History, 
-  UserCheck,
-  ChevronRight,
-  ShieldCheck,
-  LogOut
+  UserCheck, 
+  ChevronRight, 
+  ShieldCheck, 
+  LogOut,
+  Lock,
+  Unlock,
+  ShieldAlert
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 
 export const TabNavigation: React.FC = () => {
-  const { sheets, activeTab, setActiveTab, currentUser, allHistory, logout } = useApp();
+  const { 
+    sheets, 
+    activeTab, 
+    setActiveTab, 
+    currentUser, 
+    allHistory, 
+    logout,
+    isAdmin,
+    isSelfLocked,
+    isAuditLocked 
+  } = useApp();
+
 
   // Keep browser tab title updated with "Họ và tên" corresponding to Google Sheet
   useEffect(() => {
@@ -108,26 +122,80 @@ export const TabNavigation: React.FC = () => {
               )}
             </button>
 
+            {/* Admin Lock Settings Tab (Only for Admin 012499) */}
+            {isAdmin && (
+              <button
+                id="tab-btn-admin-locks"
+                onClick={() => setActiveTab('admin')}
+                className={`px-3 py-1.5 rounded-md font-medium transition-all flex items-center gap-1.5 ${
+                  activeTab === 'admin'
+                    ? 'bg-rose-700 text-white shadow-xs font-semibold'
+                    : 'bg-rose-50 text-rose-800 hover:bg-rose-100 border border-rose-300 font-semibold'
+                }`}
+                title="Quản trị viên 012499: Khóa chấm điểm và khóa phúc tra theo ngày"
+              >
+                <Lock className="w-3.5 h-3.5 text-rose-600" />
+                <span>Khóa Theo Ngày (Admin 012499)</span>
+                {(isSelfLocked.isLocked || isAuditLocked.isLocked) && (
+                  <span className="w-2 h-2 rounded-full bg-rose-500 animate-ping" />
+                )}
+              </button>
+            )}
+
             {/* Tab User Info: Hiển thị tên trên tab theo "Họ và tên" tương ứng trong Google Sheet */}
             {currentUser && (
               <div 
                 id="tab-current-user-name"
-                className="ml-2 inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-emerald-50 text-emerald-900 border border-emerald-300 font-semibold shadow-2xs"
+                className={`ml-2 inline-flex items-center gap-2 px-3 py-1 rounded-lg border font-semibold shadow-2xs ${
+                  isAdmin 
+                    ? 'bg-amber-50 text-amber-950 border-amber-300' 
+                    : 'bg-emerald-50 text-emerald-900 border-emerald-300'
+                }`}
                 title={`Đang đăng nhập bằng Số hiệu: ${currentUser.employeeId}`}
               >
-                <UserCheck className="w-3.5 h-3.5 text-emerald-600" />
+                {isAdmin ? (
+                  <span className="text-amber-600 text-xs">👑 Admin:</span>
+                ) : (
+                  <UserCheck className="w-3.5 h-3.5 text-emerald-600" />
+                )}
                 <span className="text-slate-500 font-normal">Họ và tên:</span>
-                <span className="text-emerald-950 font-bold">{currentUser.name}</span>
-                <span className="text-[10px] font-mono bg-white px-1.5 py-0.5 rounded border border-emerald-200 text-emerald-800 font-semibold">
+                <span className="font-bold">{currentUser.name}</span>
+                <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded border font-semibold ${
+                  isAdmin 
+                    ? 'bg-amber-100 text-amber-900 border-amber-300' 
+                    : 'bg-white text-emerald-800 border-emerald-200'
+                }`}>
                   SH: {currentUser.employeeId}
                 </span>
               </div>
             )}
           </div>
 
-          <div className="text-[11px] text-slate-500 hidden md:flex items-center gap-1">
-            <ShieldCheck className="w-3.5 h-3.5 text-blue-600" />
-            <span>Mỗi lần sửa ô đều lưu tên người đăng nhập & thời gian</span>
+          <div className="text-[11px] text-slate-500 hidden md:flex items-center gap-2">
+            {/* Real-time system lock indicator */}
+            {isSelfLocked.isLocked ? (
+              <span className="inline-flex items-center gap-1 text-rose-700 bg-rose-50 px-2 py-0.5 rounded border border-rose-200 font-medium">
+                <Lock className="w-3 h-3 text-rose-600" />
+                <span>Chấm điểm: Đang khóa</span>
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-1 text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 font-medium">
+                <Unlock className="w-3 h-3 text-emerald-600" />
+                <span>Chấm điểm: Đang mở</span>
+              </span>
+            )}
+
+            {isAuditLocked.isLocked ? (
+              <span className="inline-flex items-center gap-1 text-purple-700 bg-purple-50 px-2 py-0.5 rounded border border-purple-200 font-medium">
+                <Lock className="w-3 h-3 text-purple-600" />
+                <span>Phúc tra: Đang khóa</span>
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-1 text-purple-700 bg-purple-50/60 px-2 py-0.5 rounded border border-purple-200 font-medium">
+                <Unlock className="w-3 h-3 text-purple-600" />
+                <span>Phúc tra: Đang mở</span>
+              </span>
+            )}
           </div>
         </div>
 

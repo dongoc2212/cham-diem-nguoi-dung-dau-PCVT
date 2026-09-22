@@ -11,7 +11,12 @@ import {
   Award,
   ChevronDown,
   Building,
-  Check
+  Check,
+  Lock,
+  Unlock,
+  AlertTriangle,
+  ShieldAlert,
+  ShieldCheck
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { SheetRowItem } from '../types';
@@ -20,7 +25,17 @@ import { exportSingleSheetToExcel } from '../utils/excelExport';
 import { getClassification, CLASSIFICATION_TIERS } from '../utils/classification';
 
 export const ScoringTable: React.FC = () => {
-  const { currentSheet, currentUser, quickFillMaxScores, clearSheetScores, triggerLoginModal } = useApp();
+  const { 
+    currentSheet, 
+    currentUser, 
+    quickFillMaxScores, 
+    clearSheetScores, 
+    triggerLoginModal,
+    isAdmin,
+    isSelfLocked,
+    isAuditLocked,
+    setActiveTab
+  } = useApp();
 
   const [searchTerm, setSearchTerm] = useState('');
   const [filterMode, setFilterMode] = useState<'all' | 'unscored' | 'scored' | 'edited'>('all');
@@ -140,6 +155,18 @@ export const ScoringTable: React.FC = () => {
       return;
     }
 
+    // Check lock conditions
+    if (!isAdmin) {
+      if ((field === 'selfScore' || field === 'explanation') && isSelfLocked.isLocked) {
+        alert(`THÔNG BÁO KHÓA CHẤM ĐIỂM:\n${isSelfLocked.reason}\n\nVui lòng liên hệ Quản trị viên (Mã NV: 012499) để được hỗ trợ mở khóa.`);
+        return;
+      }
+      if (field === 'auditScore' && isAuditLocked.isLocked) {
+        alert(`THÔNG BÁO KHÓA PHÚC TRA:\n${isAuditLocked.reason}\n\nVui lòng liên hệ Quản trị viên (Mã NV: 012499) để được hỗ trợ mở khóa.`);
+        return;
+      }
+    }
+
     setModalState({ isOpen: true, row, field });
   };
 
@@ -196,23 +223,45 @@ export const ScoringTable: React.FC = () => {
           <div className="flex flex-wrap items-center gap-2">
             <button
               id="btn-quick-fill-max"
+              disabled={isSelfLocked.isLocked && !isAdmin}
               onClick={() => quickFillMaxScores(currentSheet.id)}
-              title="Tự động điền điểm chấm bằng điểm chuẩn tối đa cho toàn bộ tiêu chí"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200 transition-colors"
+              title={
+                isSelfLocked.isLocked && !isAdmin
+                  ? `Chức năng chấm điểm đã bị khóa: ${isSelfLocked.reason}`
+                  : "Tự động điền điểm chấm bằng điểm chuẩn tối đa cho toàn bộ tiêu chí"
+              }
+              className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg border transition-colors ${
+                isSelfLocked.isLocked && !isAdmin
+                  ? 'bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed'
+                  : 'bg-blue-50 text-blue-700 hover:bg-blue-100 border-blue-200'
+              }`}
             >
-              <Sparkles className="w-3.5 h-3.5 text-blue-600" />
+              {isSelfLocked.isLocked && !isAdmin ? (
+                <Lock className="w-3.5 h-3.5 text-slate-400" />
+              ) : (
+                <Sparkles className="w-3.5 h-3.5 text-blue-600" />
+              )}
               <span>Chấm điểm tối đa</span>
             </button>
 
             <button
               id="btn-clear-sheet-scores"
+              disabled={isSelfLocked.isLocked && !isAdmin}
               onClick={() => {
                 if (window.confirm(`Bạn có chắc muốn xóa điểm tự chấm của sheet ${currentSheet.code}?`)) {
                   clearSheetScores(currentSheet.id);
                 }
               }}
-              title="Xóa toàn bộ điểm chấm và giải trình của sheet này"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-50 text-slate-600 hover:text-rose-600 hover:bg-rose-50 border border-slate-200 transition-colors"
+              title={
+                isSelfLocked.isLocked && !isAdmin
+                  ? `Chức năng chấm điểm đã bị khóa: ${isSelfLocked.reason}`
+                  : "Xóa toàn bộ điểm chấm và giải trình của sheet này"
+              }
+              className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg border transition-colors ${
+                isSelfLocked.isLocked && !isAdmin
+                  ? 'bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed'
+                  : 'bg-slate-50 text-slate-600 hover:text-rose-600 hover:bg-rose-50 border-slate-200'
+              }`}
             >
               <RotateCcw className="w-3.5 h-3.5" />
               <span>Xóa điểm</span>
@@ -229,6 +278,75 @@ export const ScoringTable: React.FC = () => {
           </div>
 
         </div>
+
+        {/* Real-time Lock Status Banners */}
+        {(isSelfLocked.isLocked || isAuditLocked.isLocked) && (
+          <div className="mt-4 space-y-2">
+            {isSelfLocked.isLocked && (
+              <div className="p-3 bg-rose-50 border border-rose-200 rounded-lg flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-rose-900">
+                <div className="flex items-center gap-2">
+                  <div className="p-1 rounded bg-rose-200/80 text-rose-700">
+                    <Lock className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <span className="font-bold">ĐÃ KHÓA CHẤM ĐIỂM: </span>
+                    <span>{isSelfLocked.reason}</span>
+                    {isAdmin && (
+                      <span className="ml-2 font-bold text-emerald-800 bg-emerald-100 px-1.5 py-0.5 rounded text-[10px]">
+                        👑 Quyền Admin: Bạn có thể sửa ô
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {isAdmin ? (
+                  <button
+                    onClick={() => setActiveTab('admin')}
+                    className="text-[11px] font-bold text-rose-800 underline hover:text-rose-950 flex-shrink-0"
+                  >
+                    Quản lý khóa Admin →
+                  </button>
+                ) : (
+                  <span className="text-[11px] text-rose-700">
+                    Liên hệ Admin: <strong>012499 - Đỗ Thị Bích Ngọc</strong>
+                  </span>
+                )}
+              </div>
+            )}
+
+            {isAuditLocked.isLocked && (
+              <div className="p-3 bg-purple-50 border border-purple-200 rounded-lg flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-purple-900">
+                <div className="flex items-center gap-2">
+                  <div className="p-1 rounded bg-purple-200/80 text-purple-700">
+                    <Lock className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <span className="font-bold">ĐÃ KHÓA ĐIỂM PHÚC TRA: </span>
+                    <span>{isAuditLocked.reason}</span>
+                    {isAdmin && (
+                      <span className="ml-2 font-bold text-emerald-800 bg-emerald-100 px-1.5 py-0.5 rounded text-[10px]">
+                        👑 Quyền Admin: Bạn có thể sửa ô
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {isAdmin ? (
+                  <button
+                    onClick={() => setActiveTab('admin')}
+                    className="text-[11px] font-bold text-purple-800 underline hover:text-purple-950 flex-shrink-0"
+                  >
+                    Quản lý khóa Admin →
+                  </button>
+                ) : (
+                  <span className="text-[11px] text-purple-700">
+                    Liên hệ Admin: <strong>012499 - Đỗ Thị Bích Ngọc</strong>
+                  </span>
+                )}
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Live Stat Cards Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3 pt-5">

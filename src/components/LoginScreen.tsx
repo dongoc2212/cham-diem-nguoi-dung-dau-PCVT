@@ -145,7 +145,29 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
               <span>Đăng Nhập Vào Hệ Thống</span>
             </button>
 
-            <div className="pt-3 border-t border-slate-100 text-[11px] text-slate-500 flex items-center justify-between">
+            {/* Quick Login Shortcut for Admin 012499 */}
+            <div className="pt-2 flex items-center justify-between text-xs bg-amber-50/80 p-2.5 rounded-lg border border-amber-200 text-amber-900">
+              <div>
+                <span className="font-bold flex items-center gap-1">
+                  👑 Quản trị viên hệ thống:
+                </span>
+                <span className="text-[11px] text-amber-800">
+                  Mã NV: <strong>012499</strong> (Đỗ Thị Bích Ngọc - TC&NS)
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setSoHieu('012499');
+                  setPassword('123456');
+                }}
+                className="px-2 py-1 bg-amber-200/80 hover:bg-amber-300 text-amber-950 font-bold rounded text-[11px] transition-colors"
+              >
+                Điền nhanh
+              </button>
+            </div>
+
+            <div className="pt-2 border-t border-slate-100 text-[11px] text-slate-500 flex items-center justify-between">
               <span className="flex items-center gap-1.5">
                 <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
                 Hệ thống lưu vết người sửa & thời gian
