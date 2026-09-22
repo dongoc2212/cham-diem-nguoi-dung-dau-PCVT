@@ -1,5 +1,6 @@
 import * as XLSX from 'xlsx';
 import { UnitSheet } from '../types';
+import { getClassification, CLASSIFICATION_TIERS } from './classification';
 
 export function exportSingleSheetToExcel(sheet: UnitSheet) {
   const wb = XLSX.utils.book_new();
@@ -19,7 +20,7 @@ export function exportSingleSheetToExcel(sheet: UnitSheet) {
     'Giải trình',
     'Đơn vị phúc tra',
     'Điểm phúc tra',
-    'Người chỉnh sửa',
+    'Người chấm / sửa (Họ và tên)',
     'Thời gian sửa'
   ]);
 
@@ -98,11 +99,7 @@ export function exportAllSheetsToExcel(sheets: UnitSheet[]) {
     const finalScore = auditTotal > 0 ? auditTotal : selfTotal;
     const percentage = ((finalScore / maxScore) * 100).toFixed(1);
 
-    let rank = 'Chưa hoàn thành';
-    if (finalScore >= 90) rank = 'Hoàn thành xuất sắc';
-    else if (finalScore >= 80) rank = 'Hoàn thành tốt';
-    else if (finalScore >= 70) rank = 'Hoàn thành nhiệm vụ';
-    else rank = 'Không hoàn thành';
+    const tier = getClassification(finalScore);
 
     summaryData.push([
       idx + 1,
@@ -112,9 +109,17 @@ export function exportAllSheetsToExcel(sheets: UnitSheet[]) {
       selfTotal,
       auditTotal > 0 ? auditTotal : 'Chưa phúc tra',
       `${percentage}%`,
-      rank
+      tier.rank
     ]);
   });
+
+  // Append criteria notes at bottom of summary
+  summaryData.push([]);
+  summaryData.push(['* QUY ĐỊNH CHỈ TIÊU XẾP LOẠI ĐÁNH GIÁ (PCVT):']);
+  summaryData.push(['- Đạt điểm chấm ≥ 90 điểm, Xếp loại Hoàn thành xuất sắc nhiệm vụ.']);
+  summaryData.push(['- Đạt điểm chấm ≥ 70 đến < 90 điểm, Xếp loại Hoàn thành tốt nhiệm vụ.']);
+  summaryData.push(['- Đạt điểm chấm ≥ 50 đến < 70 điểm, Xếp loại hoàn thành nhiệm vụ.']);
+  summaryData.push(['- Đạt điểm chấm < 50 điểm, Xếp loại không hoàn thành nhiệm vụ.']);
 
   const wsSummary = XLSX.utils.aoa_to_sheet(summaryData);
   wsSummary['!cols'] = [

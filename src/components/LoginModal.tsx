@@ -41,7 +41,7 @@ export const LoginModal: React.FC = () => {
           <div className="flex items-center gap-2">
             <LogIn className="w-5 h-5 text-blue-600" />
             <h3 className="font-bold text-slate-900 text-sm sm:text-base">
-              Đăng Nhập Số Hiệu Nhân Viên
+              Đăng Nhập Tài Khoản
             </h3>
           </div>
           <button
@@ -54,7 +54,7 @@ export const LoginModal: React.FC = () => {
 
         <div className="p-5 space-y-4">
           <div className="p-3 bg-blue-50/70 border border-blue-100 rounded-lg text-xs text-blue-900 leading-relaxed">
-            <strong>Ghi nhận lịch sử:</strong> Đăng nhập với <strong>Số hiệu</strong> trong danh sách Google Sheet PCVT để ghi nhận danh tính người sửa và thời gian.
+            <strong>Ghi nhận lịch sử:</strong> Đăng nhập với mã số nhân viên để ghi nhận danh tính người chấm và thời gian sửa.
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-3">

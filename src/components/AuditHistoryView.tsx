@@ -147,7 +147,7 @@ export const AuditHistoryView: React.FC<AuditHistoryViewProps> = ({ onJumpToShee
               <thead>
                 <tr className="bg-slate-100 text-slate-700 font-bold border-b border-slate-200">
                   <th className="py-3 px-4 w-32">Thời gian</th>
-                  <th className="py-3 px-4 w-44">Người chỉnh sửa</th>
+                  <th className="py-3 px-4 w-52">Người chấm / sửa (Họ và tên)</th>
                   <th className="py-3 px-3 w-28 text-center">Đơn vị (Sheet)</th>
                   <th className="py-3 px-3 w-20 text-center">STT</th>
                   <th className="py-3 px-4 min-w-[200px]">Nội dung tiêu chí</th>
