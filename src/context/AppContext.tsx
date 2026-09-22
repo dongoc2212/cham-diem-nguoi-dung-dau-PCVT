@@ -33,14 +33,14 @@ const STORAGE_KEY_HISTORY = 'pcvt_history_storage_v2';
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  // 1. Current user (default to NV01 for seamless out-of-the-box experience, can switch or log out anytime)
+  // 1. Current user (requires login before entering app)
   const [currentUser, setCurrentUser] = useState<User | null>(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY_USER);
       if (saved) return JSON.parse(saved);
-      return DEFAULT_USERS[0]; // NV01 Nguyễn Văn An - Trưởng Văn phòng
+      return null;
     } catch {
-      return DEFAULT_USERS[0];
+      return null;
     }
   });
 

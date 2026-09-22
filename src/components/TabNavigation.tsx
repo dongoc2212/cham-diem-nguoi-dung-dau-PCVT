@@ -1,17 +1,26 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { 
   Building2, 
   BarChart3, 
-  LogIn, 
   History, 
-  CheckCircle, 
+  UserCheck,
   ChevronRight,
-  ShieldCheck
+  ShieldCheck,
+  LogOut
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 
 export const TabNavigation: React.FC = () => {
-  const { sheets, activeTab, setActiveTab, currentUser, allHistory } = useApp();
+  const { sheets, activeTab, setActiveTab, currentUser, allHistory, logout } = useApp();
+
+  // Keep browser tab title updated with "Họ và tên" corresponding to Google Sheet
+  useEffect(() => {
+    if (currentUser) {
+      document.title = `${currentUser.name} - Chấm Điểm Người Đứng Đầu PCVT`;
+    } else {
+      document.title = 'Chấm Điểm Người Đứng Đầu PCVT';
+    }
+  }, [currentUser]);
 
   // Helper to compute progress for each sheet
   const getSheetSummary = (sheetId: string) => {
@@ -40,10 +49,10 @@ export const TabNavigation: React.FC = () => {
   };
 
   return (
-    <div className="bg-white border-b border-slate-200 shadow-sm sticky top-[61px] z-30">
+    <div className="bg-white border-b border-slate-200 shadow-xs sticky top-[61px] z-30">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        {/* Top utility tab bar (Summary, Login Tab, Audit History) */}
+        {/* Top utility tab bar (Summary, Audit History, Active User Info Tab) */}
         <div className="flex items-center justify-between py-2 border-b border-slate-100 overflow-x-auto text-xs">
           <div className="flex items-center space-x-1">
             <span className="text-slate-500 font-medium px-2 hidden sm:inline">Xem theo:</span>
@@ -52,12 +61,12 @@ export const TabNavigation: React.FC = () => {
             <button
               id="tab-btn-sheets-group"
               onClick={() => {
-                if (['summary', 'login', 'audit'].includes(activeTab)) {
+                if (['summary', 'audit'].includes(activeTab)) {
                   setActiveTab('tab_1');
                 }
               }}
               className={`px-3 py-1.5 rounded-md font-medium transition-all flex items-center gap-1.5 ${
-                !['summary', 'login', 'audit'].includes(activeTab)
+                !['summary', 'audit'].includes(activeTab)
                   ? 'bg-blue-50 text-blue-700 font-semibold'
                   : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
               }`}
@@ -72,7 +81,7 @@ export const TabNavigation: React.FC = () => {
               onClick={() => setActiveTab('summary')}
               className={`px-3 py-1.5 rounded-md font-medium transition-all flex items-center gap-1.5 ${
                 activeTab === 'summary'
-                  ? 'bg-blue-600 text-white shadow-sm'
+                  ? 'bg-blue-600 text-white shadow-xs'
                   : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
               }`}
             >
@@ -86,7 +95,7 @@ export const TabNavigation: React.FC = () => {
               onClick={() => setActiveTab('audit')}
               className={`px-3 py-1.5 rounded-md font-medium transition-all flex items-center gap-1.5 ${
                 activeTab === 'audit'
-                  ? 'bg-amber-600 text-white shadow-sm'
+                  ? 'bg-amber-600 text-white shadow-xs'
                   : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
               }`}
             >
@@ -99,25 +108,21 @@ export const TabNavigation: React.FC = () => {
               )}
             </button>
 
-            {/* Explicit Login Tab as requested in prompt */}
-            <button
-              id="tab-btn-login"
-              onClick={() => setActiveTab('login')}
-              className={`px-3 py-1.5 rounded-md font-medium transition-all flex items-center gap-1.5 ${
-                activeTab === 'login'
-                  ? 'bg-indigo-600 text-white shadow-sm'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
-              }`}
-            >
-              <LogIn className="w-3.5 h-3.5" />
-              <span>Tab Đăng Nhập (Mã NV)</span>
-              {currentUser && (
-                <span className="bg-emerald-100 text-emerald-700 text-[10px] px-1.5 py-0.2 rounded-full font-bold flex items-center gap-0.5">
-                  <CheckCircle className="w-2.5 h-2.5" />
-                  {currentUser.employeeId}
+            {/* Tab User Info: Hiển thị tên trên tab theo "Họ và tên" tương ứng trong Google Sheet */}
+            {currentUser && (
+              <div 
+                id="tab-current-user-name"
+                className="ml-2 inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-emerald-50 text-emerald-900 border border-emerald-300 font-semibold shadow-2xs"
+                title={`Đang đăng nhập bằng Số hiệu: ${currentUser.employeeId}`}
+              >
+                <UserCheck className="w-3.5 h-3.5 text-emerald-600" />
+                <span className="text-slate-500 font-normal">Họ và tên:</span>
+                <span className="text-emerald-950 font-bold">{currentUser.name}</span>
+                <span className="text-[10px] font-mono bg-white px-1.5 py-0.5 rounded border border-emerald-200 text-emerald-800 font-semibold">
+                  SH: {currentUser.employeeId}
                 </span>
-              )}
-            </button>
+              </div>
+            )}
           </div>
 
           <div className="text-[11px] text-slate-500 hidden md:flex items-center gap-1">

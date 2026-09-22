@@ -43,11 +43,16 @@ export interface UnitSheet {
 }
 
 export interface User {
-  employeeId: string;
-  name: string;
-  unit: string;
-  role: 'leader' | 'reviewer' | 'admin' | 'staff';
-  title?: string;
+  employeeId: string; // Số hiệu
+  name: string;       // Họ và tên
+  unit: string;       // Đơn vị
+  department?: string;// Phòng ban
+  team?: string;      // Tổ nhóm
+  phone?: string;     // Số điện thoại
+  email?: string;     // Email
+  dob?: string;       // Ngày sinh
+  role: 'leader' | 'reviewer' | 'admin' | 'staff' | 'manager';
+  title?: string;     // Chức danh
 }
 
 export interface AuditFilter {

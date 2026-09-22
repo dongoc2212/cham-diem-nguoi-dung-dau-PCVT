@@ -120,18 +120,20 @@ export const Header: React.FC<HeaderProps> = ({ onOpenHistory }) => {
             <div className="h-6 w-px bg-slate-700 mx-1 hidden sm:block"></div>
 
             {currentUser ? (
-              <div className="flex items-center gap-2 bg-slate-800/80 pl-2.5 pr-1 py-1 rounded-lg border border-slate-700">
-                <div className="flex items-center gap-1.5 text-left">
-                  <UserCheck className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+              <div className="flex items-center gap-2 bg-slate-800/90 pl-3 pr-1.5 py-1 rounded-lg border border-slate-700 shadow-xs">
+                <div className="flex items-center gap-2 text-left">
+                  <div className="w-7 h-7 rounded-full bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center text-emerald-400 font-bold text-xs">
+                    {currentUser.name.split(' ').pop()?.charAt(0) || 'NV'}
+                  </div>
                   <div className="leading-tight">
-                    <div className="flex items-center gap-1">
-                      <span className="font-semibold text-xs text-white">{currentUser.name}</span>
-                      <span className="text-[10px] font-mono bg-blue-900/60 text-blue-300 px-1 py-0.2 rounded border border-blue-700/50">
+                    <div className="flex items-center gap-1.5">
+                      <span className="font-bold text-xs text-white tracking-tight">{currentUser.name}</span>
+                      <span className="text-[10px] font-mono bg-blue-900/80 text-blue-200 px-1.5 py-0.2 rounded border border-blue-600/50">
                         {currentUser.employeeId}
                       </span>
                     </div>
-                    <span className="text-[10px] text-slate-400 block truncate max-w-[140px]">
-                      {currentUser.unit}
+                    <span className="text-[10px] text-slate-300 block truncate max-w-[160px]">
+                      {currentUser.title || currentUser.unit}
                     </span>
                   </div>
                 </div>
@@ -139,10 +141,11 @@ export const Header: React.FC<HeaderProps> = ({ onOpenHistory }) => {
                 <button
                   id="btn-header-logout"
                   onClick={logout}
-                  title="Đăng xuất tài khoản"
-                  className="p-1.5 text-slate-400 hover:text-rose-300 hover:bg-slate-700 rounded transition-colors ml-1"
+                  title="Đăng xuất khỏi hệ thống"
+                  className="p-1.5 text-slate-400 hover:text-rose-300 hover:bg-slate-700/80 rounded transition-colors ml-1 flex items-center gap-1 text-[11px]"
                 >
                   <LogOut className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">Thoát</span>
                 </button>
               </div>
             ) : (
@@ -152,7 +155,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenHistory }) => {
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-blue-600 hover:bg-blue-500 text-white transition-colors shadow-sm"
               >
                 <LogIn className="w-3.5 h-3.5" />
-                <span>Đăng nhập Mã NV</span>
+                <span>Đăng nhập Số hiệu</span>
               </button>
             )}
 
