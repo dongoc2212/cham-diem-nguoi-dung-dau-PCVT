@@ -1,0 +1,6 @@
+{
+  "name": "Chấm Điểm Lãnh Đạo Trực Thuộc PCVT",
+  "description": "Hệ thống chấm điểm, phúc tra và giải trình dành cho người đứng đầu các Phòng, Đội, Điện lực trực thuộc PCVT với 13 đơn vị, ghi nhận lịch sử điều chỉnh và xuất file Excel.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
